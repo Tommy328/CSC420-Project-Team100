@@ -129,8 +129,10 @@ class Dataset(torch.utils.data.Dataset):
         Ix = ndimage.convolve(img, filterx, mode='nearest')
         Iy = ndimage.convolve(img, filterx.T, mode='nearest')
         gradient = np.sqrt(np.square(Ix) + np.square(Iy))
-        gradient[gradient>np.mean(gradient)] = 1
-        gradient[gradient!=1] = 0
+        # gradient[gradient>np.mean(gradient)] = 1
+        # gradient[gradient!=1] = 0
+        if not self.training:
+            gradient[np.invert(mask)] = 0
         return gradient
 
     def load_mask(self, img, index):
