@@ -133,7 +133,7 @@ class Dataset(torch.utils.data.Dataset):
         # gradient[gradient!=1] = 0
         if not self.training:
             gradient[np.invert(mask)] = 0
-        return gradient
+        return gradient/gradient.max()
 
     def load_mask(self, img, index):
         imgh, imgw = img.shape[0:2]
