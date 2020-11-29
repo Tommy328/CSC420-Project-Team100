@@ -75,18 +75,18 @@ class Dataset(torch.utils.data.Dataset):
         edge = self.load_edge(img_gray, index, mask)
 
         # load gradient
-        # gradient = self.load_gradient(img_gray, index, mask)
+        gradient = self.load_gradient(img_gray, index, mask)
 
         # augment data
         if self.augment and np.random.binomial(1, 0.5) > 0:
             img = img[:, ::-1, ...]
             img_gray = img_gray[:, ::-1, ...]
             edge = edge[:, ::-1, ...]
-            # gradient = gradient[:, ::-1, ...]
+            gradient = gradient[:, ::-1, ...]
             mask = mask[:, ::-1, ...]
 
-        return self.to_tensor(img), self.to_tensor(img_gray), self.to_tensor(edge), self.to_tensor(mask)
-        # return self.to_tensor(img), self.to_tensor(img_gray), self.to_tensor(edge), self.to_tensor(mask), self.to_tensor(gradient)
+        # return self.to_tensor(img), self.to_tensor(img_gray), self.to_tensor(edge), self.to_tensor(mask)
+        return self.to_tensor(img), self.to_tensor(img_gray), self.to_tensor(edge), self.to_tensor(mask), self.to_tensor(gradient)
 
     def load_edge(self, img, index, mask):
         sigma = self.sigma

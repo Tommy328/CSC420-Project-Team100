@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from .dataset import Dataset
-from .models import EdgeModel, InpaintingModel
+from .models import EdgeModel, InpaintingModel, MyInpaintingModel
 from .utils import Progbar, create_dir, stitch_images, imsave
 from .metrics import PSNR, EdgeAccuracy
 
@@ -20,11 +20,13 @@ class EdgeConnect():
             model_name = 'edge_inpaint'
         elif config.MODEL == 4:
             model_name = 'joint'
+        elif config.MODEL == 5:
+            model_name = 'edge_gradient_inpaint'
 
         self.debug = False
         self.model_name = model_name
         self.edge_model = EdgeModel(config).to(config.DEVICE)
-        self.inpaint_model = InpaintingModel(config).to(config.DEVICE)
+        self.inpaint_model = InpaintingModel(config).to(config.DEVICE) if config.MODEL != 5 else MyInpaintingModel(config).to(config.DEVICE)
 
         self.psnr = PSNR(255.0).to(config.DEVICE)
         self.edgeacc = EdgeAccuracy(config.EDGE_THRESHOLD).to(config.DEVICE)
@@ -99,7 +101,7 @@ class EdgeConnect():
                 self.edge_model.train()
                 self.inpaint_model.train()
 
-                images, images_gray, edges, masks = self.cuda(*items)
+                images, images_gray, edges, masks, gradient = self.cuda(*items)
 
                 # edge model
                 if model == 1:
@@ -155,6 +157,21 @@ class EdgeConnect():
                     self.inpaint_model.backward(gen_loss, dis_loss)
                     iteration = self.inpaint_model.iteration
 
+                # edge, gradient inpaint model
+                elif model == 5:
+                    # train
+                    outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, edges, masks, gradient)
+                    outputs_merged = (outputs * masks) + (images * (1 - masks))
+
+                    # metrics
+                    psnr = self.psnr(self.postprocess(images), self.postprocess(outputs_merged))
+                    mae = (torch.sum(torch.abs(images - outputs_merged)) / torch.sum(images)).float()
+                    logs.append(('psnr', psnr.item()))
+                    logs.append(('mae', mae.item()))
+
+                    # backward
+                    self.inpaint_model.backward(gen_loss, dis_loss)
+                    iteration = self.inpaint_model.iteration
 
                 # joint model
                 else:
@@ -229,7 +246,7 @@ class EdgeConnect():
 
         for items in val_loader:
             iteration += 1
-            images, images_gray, edges, masks = self.cuda(*items)
+            images, images_gray, edges, masks, gradient = self.cuda(*items)
 
             # edge model
             if model == 1:
@@ -270,6 +287,17 @@ class EdgeConnect():
                 logs.append(('psnr', psnr.item()))
                 logs.append(('mae', mae.item()))
 
+            # edge, gradient inpaint model
+            elif model == 5:
+                # eval
+                outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, edges, masks, gradient)
+                outputs_merged = (outputs * masks) + (images * (1 - masks))
+
+                # metrics
+                psnr = self.psnr(self.postprocess(images), self.postprocess(outputs_merged))
+                mae = (torch.sum(torch.abs(images - outputs_merged)) / torch.sum(images)).float()
+                logs.append(('psnr', psnr.item()))
+                logs.append(('mae', mae.item()))
 
             # joint model
             else:
@@ -308,7 +336,7 @@ class EdgeConnect():
         index = 0
         for items in test_loader:
             name = self.test_dataset.load_name(index)
-            images, images_gray, edges, masks = self.cuda(*items)
+            images, images_gray, edges, masks, gradient = self.cuda(*items)
             index += 1
 
             # edge model
@@ -320,6 +348,12 @@ class EdgeConnect():
             elif model == 2:
                 outputs = self.inpaint_model(images, edges, masks)
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
+
+            # edge, gradient inpainting model
+            elif model == 2:
+                outputs = self.inpaint_model(images, edges, masks, gradient)
+                outputs_merged = (outputs * masks) + (images * (1 - masks))
+
 
             # inpaint with edge model / joint model
             else:
@@ -353,7 +387,8 @@ class EdgeConnect():
 
         model = self.config.MODEL
         items = next(self.sample_iterator)
-        images, images_gray, edges, masks = self.cuda(*items)
+        # images, images_gray, edges, masks = self.cuda(*items)
+        images, images_gray, edges, masks, gradient = self.cuda(*items)
 
         # edge model
         if model == 1:
@@ -369,12 +404,19 @@ class EdgeConnect():
             outputs = self.inpaint_model(images, edges, masks)
             outputs_merged = (outputs * masks) + (images * (1 - masks))
 
+        elif model == 5:
+            iteration = self.inpaint_model.iteration
+            inputs = (images * (1 - masks)) + masks
+            outputs = self.inpaint_model(images, edges, masks, gradient)
+            outputs_merged = (outputs * masks) + (images * (1 - masks))
+
         # inpaint with edge model / joint model
         else:
             iteration = self.inpaint_model.iteration
             inputs = (images * (1 - masks)) + masks
             outputs = self.edge_model(images_gray, edges, masks).detach()
             edges = (outputs * masks + edges * (1 - masks)).detach()
+            gradient
             outputs = self.inpaint_model(images, edges, masks)
             outputs_merged = (outputs * masks) + (images * (1 - masks))
 
@@ -389,11 +431,11 @@ class EdgeConnect():
             self.postprocess(images),
             self.postprocess(inputs),
             self.postprocess(edges),
+            self.postprocess(gradient),
             self.postprocess(outputs),
             self.postprocess(outputs_merged),
             img_per_row = image_per_row
         )
-
 
         path = os.path.join(self.samples_path, self.model_name)
         name = os.path.join(path, str(iteration).zfill(5) + ".png")
