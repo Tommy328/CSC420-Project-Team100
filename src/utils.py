@@ -11,6 +11,15 @@ def create_dir(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
+def neighbours(x , y):
+  # finds the 8 neighbours if the selected cell
+  return np.array([(x-1, y-1), (x-1, y), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y-1), (x+1, y), (x+1, y+1)])
+
+def inborder(neighbour, h, w):
+  # removed the neighbours that are outside the border of the image
+  n = [i for i in filter((lambda x: x[0] >= 0 and x[0] < h), neighbour)]
+  n = [i for i in filter((lambda x: x[1] >= 0 and x[1] < w), n)]
+  return n
 
 def create_mask(width, height, mask_width, mask_height, x=None, y=None):
     mask = np.zeros((height, width))

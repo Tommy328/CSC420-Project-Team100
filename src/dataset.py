@@ -11,7 +11,7 @@ from scipy.misc import imread
 from scipy import ndimage
 from skimage.feature import canny
 from skimage.color import rgb2gray, gray2rgb
-from .utils import create_mask
+from .utils import create_mask, neighbours, inborder
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -129,9 +129,21 @@ class Dataset(torch.utils.data.Dataset):
         Ix = ndimage.convolve(img, filterx, mode='nearest')
         Iy = ndimage.convolve(img, filterx.T, mode='nearest')
         gradient = np.sqrt(np.square(Ix) + np.square(Iy))
-        gradient[gradient>np.mean(gradient)] = 1
-        gradient[gradient!=1] = 0
-        return gradient
+        # gradient[gradient>np.mean(gradient)] = 1
+        # gradient[gradient!=1] = 0
+        if not self.training:
+            new_mask = np.copy(mask)
+            h, w = new_mask.shape[:2]
+            for x in range(h):
+                for y in range(w):
+                    if mask[x,y]:
+                        continue
+                    masked = [mask[cell[0],cell[1]] for cell in inborder(neighbours(x, y), h, w)]
+                    if any(masked):
+                        new_mask[x,y] = False
+
+            gradient[np.invert(new_mask)] = 0
+        return gradient/gradient.max()
 
     def load_mask(self, img, index):
         imgh, imgw = img.shape[0:2]

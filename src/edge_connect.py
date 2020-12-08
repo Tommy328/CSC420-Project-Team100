@@ -350,10 +350,9 @@ class EdgeConnect():
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
 
             # edge, gradient inpainting model
-            elif model == 2:
+            elif model == 5:
                 outputs = self.inpaint_model(images, edges, masks, gradient)
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
-
 
             # inpaint with edge model / joint model
             else:
