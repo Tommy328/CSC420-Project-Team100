@@ -3,7 +3,9 @@ import sys
 import time
 import random
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib  
+matplotlib.use('TkAgg')   
+import matplotlib.pyplot as plt  
 from PIL import Image
 
 
