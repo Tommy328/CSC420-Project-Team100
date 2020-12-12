@@ -1,0 +1,5 @@
+Model 5:
+python ./scripts/loss_plot.py --path ./checkpoints/mymodel5/log_edge_gradient_inpaint.dat --output ./checkpoints/mymodel5/
+
+Model 2:
+python ./scripts/loss_plot.py --path ./checkpoints/mymodel2/log_inpaint.dat --output ./checkpoints/mymodel2/
