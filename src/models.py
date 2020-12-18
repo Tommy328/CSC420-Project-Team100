@@ -356,6 +356,7 @@ class InpaintingModel(BaseModel):
         gen_loss.backward()
         self.gen_optimizer.step()
 
+# edge gradient inpainting model
 class MyInpaintingModel(BaseModel):
     def __init__(self, config):
         super(MyInpaintingModel, self).__init__('MyInpaintingModel', config)

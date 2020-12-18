@@ -144,5 +144,5 @@ if __name__ == '__main__':
 
     # for inpaint model, with 4 losses in log:
     loss_plots(args.path, args.output, ['disc_loss', 'gen_adversarial_loss', 'gen_L1_loss', 'gen_perceptual_loss', 'gen_style_loss'])
-    # mae_psnr_plots(path, output)
+    mae_psnr_plots(path, output)
 

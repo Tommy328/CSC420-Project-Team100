@@ -61,7 +61,6 @@ def imsave(img, path):
     im = Image.fromarray(img.cpu().numpy().astype(np.uint8).squeeze())
     im.save(path)
 
-
 class Progbar(object):
     """Displays a progress bar.
 

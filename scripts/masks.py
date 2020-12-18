@@ -4,9 +4,10 @@ import argparse
 import numpy as np
 import cv2 
 
+# Classify the mask images by coverage percentage and move the original file to the corresponding folder
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--path', type=str, help='path to the dataset')
-# parser.add_argument('--output', type=str, help='path to the file list')
 args = parser.parse_args()
 
 ext = {'.JPG', '.JPEG', '.PNG', '.TIF', 'TIFF'}

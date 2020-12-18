@@ -28,6 +28,8 @@ class EdgeConnect():
             model_name = 'gradient'
         elif config.MODEL == 8:
             model_name = 'gradient_edge_connect'
+        elif config.MODEL == 9:
+            model_name = 'gradient_inpaint'
 
         self.debug = False
         self.model_name = model_name
@@ -74,6 +76,9 @@ class EdgeConnect():
         elif self.config.MODEL == 7:
             self.gradient_model.load()
 
+        elif self.config.MODEL == 9:
+            self.inpaint_model.load()
+            self.gradient_model.load()
         else:
             self.edge_model.load()
             self.inpaint_model.load()
@@ -143,7 +148,7 @@ class EdgeConnect():
                     iteration = self.edge_model.iteration
 
 
-                # inpaint model
+                # inpaint with GT edge
                 elif model == 2:
                     # train
                     outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, edges, masks)
@@ -246,6 +251,7 @@ class EdgeConnect():
                     self.gradient_model.backward(g_gen_loss, g_dis_loss)
                     iteration = self.gradient_model.iteration
                 
+                # edge gradient inpainting model
                 elif model == 8:
                     # train
                     if True or np.random.binomial(1, 0.5) > 0:
@@ -258,6 +264,22 @@ class EdgeConnect():
                     g_output = g_output * masks + gradient * (1 - masks)
 
                     outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, e_outputs.detach(), masks, g_output.detach())
+                    outputs_merged = (outputs * masks) + (images * (1 - masks))
+
+                    # metrics
+                    psnr = self.psnr(self.postprocess(images), self.postprocess(outputs_merged))
+                    mae = (torch.sum(torch.abs(images - outputs_merged)) / torch.sum(images)).float()
+                    logs.append(('psnr', psnr.item()))
+                    logs.append(('mae', mae.item()))
+
+                    # backward
+                    self.inpaint_model.backward(gen_loss, dis_loss)
+                    iteration = self.inpaint_model.iteration
+
+                # inpaint with GT graident
+                elif model == 9:
+                    # train
+                    outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, gradient, masks)
                     outputs_merged = (outputs * masks) + (images * (1 - masks))
 
                     # metrics
@@ -336,6 +358,7 @@ class EdgeConnect():
         total = len(self.val_dataset)
 
         self.edge_model.eval()
+        self.gradient_model.eval()
         self.inpaint_model.eval()
 
         progbar = Progbar(total, width=20, stateful_metrics=['it'])
@@ -356,7 +379,7 @@ class EdgeConnect():
                 logs.append(('recall', recall.item()))
 
 
-            # inpaint model
+            # inpaint with GT edge
             elif model == 2:
                 # eval
                 outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, edges, masks)
@@ -423,6 +446,7 @@ class EdgeConnect():
                 i_logs.append(('mae', mae.item()))
                 logs = e_logs + g_logs + i_logs
 
+            # gradient model
             elif model == 7:
                 g_outputs, g_gen_loss, g_dis_loss, g_logs = self.gradient_model.process(images_gray, gradient, masks)
                 g_outputs = g_outputs * masks + gradient * (1 - masks)
@@ -432,6 +456,18 @@ class EdgeConnect():
                 g_mae = (torch.sum(torch.abs(gradient - g_outputs)) / torch.sum(gradient)).float()
                 g_logs.append(('psnr', g_psnr.item()))
                 g_logs.append(('mae', g_mae.item()))
+
+            # inpaint with GT gradient
+            elif model == 9:
+                # eval
+                outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, gradient, masks)
+                outputs_merged = (outputs * masks) + (images * (1 - masks))
+
+                # metrics
+                psnr = self.psnr(self.postprocess(images), self.postprocess(outputs_merged))
+                mae = (torch.sum(torch.abs(images - outputs_merged)) / torch.sum(images)).float()
+                logs.append(('psnr', psnr.item()))
+                logs.append(('mae', mae.item()))
 
             # joint model
             else:
@@ -457,6 +493,7 @@ class EdgeConnect():
 
     def test(self):
         self.edge_model.eval()
+        self.gradient_model.eval()
         self.inpaint_model.eval()
 
         model = self.config.MODEL
@@ -480,16 +517,34 @@ class EdgeConnect():
 
             # inpaint model
             elif model == 2:
-                outputs = self.inpaint_model(images, edges, masks)
+                inputs = (images * (1 - masks)) + masks
+                outputs = self.inpaint_model(images, gradient, masks)
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
 
             # edge, gradient inpainting model
-            elif model == 5 or model == 8:
+            elif model == 5:
+                inputs = (images * (1 - masks)) + masks
+                outputs = self.inpaint_model(images, edges, masks, gradient)
+                outputs_merged = (outputs * masks) + (images * (1 - masks))
+
+            # gradient model
+            elif model == 9:
+                inputs = (images * (1 - masks)) + masks
+                gradient = self.gradient_model(images_gray,gradient,masks).detach()
+                outputs = self.inpaint_model(images, gradient, masks)
+                outputs_merged = (outputs * masks) + (images * (1 - masks))
+
+            # edge gradient joint model
+            elif model == 8:
+                inputs = (images * (1 - masks)) + masks
+                gradient = self.gradient_model(images_gray,gradient,masks).detach()
+                edges = self.edge_model(images_gray, edges, masks).detach()
                 outputs = self.inpaint_model(images, edges, masks, gradient)
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
 
             # inpaint with edge model / joint model
             else:
+                inputs = (images * (1 - masks)) + masks
                 edges = self.edge_model(images_gray, edges, masks).detach()
                 outputs = self.inpaint_model(images, edges, masks)
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
@@ -508,6 +563,24 @@ class EdgeConnect():
                 imsave(edges, os.path.join(self.results_path, fname + '_edge.' + fext))
                 imsave(masked, os.path.join(self.results_path, fname + '_masked.' + fext))
 
+            # image_per_row = 1
+
+            # images = stitch_images(
+            #     self.postprocess(images),
+            #     self.postprocess(inputs),
+            #     self.postprocess(edges),
+            #     self.postprocess(gradient),
+            #     self.postprocess(outputs),
+            #     self.postprocess(outputs_merged),
+            #     img_per_row = image_per_row
+            # )
+
+            # path = os.path.join(self.samples_path, self.model_name)
+            # name = os.path.join(path, "sample" + str(name) + ".png")
+            # create_dir(path)
+            # print('\nsaving sample ' + name)
+            # images.save(name)
+
         print('\nEnd test....')
 
     def sample(self, it=None):
@@ -516,6 +589,7 @@ class EdgeConnect():
             return
 
         self.edge_model.eval()
+        self.gradient_model.eval()
         self.inpaint_model.eval()
 
         model = self.config.MODEL
@@ -530,20 +604,20 @@ class EdgeConnect():
             outputs = self.edge_model(images_gray, edges, masks)
             outputs_merged = (outputs * masks) + (edges * (1 - masks))
 
-        # inpaint model
+        # inpaint with GT edge
         elif model == 2:
             iteration = self.inpaint_model.iteration
             inputs = (images * (1 - masks)) + masks
             outputs = self.inpaint_model(images, edges, masks)
             outputs_merged = (outputs * masks) + (images * (1 - masks))
 
-        elif model == 5 or model == 8:
+        elif model == 5:
             iteration = self.inpaint_model.iteration
             inputs = (images * (1 - masks)) + masks
             outputs = self.inpaint_model(images, edges, masks, gradient)
             outputs_merged = (outputs * masks) + (images * (1 - masks))
 
-        elif model == 6:
+        elif model == 6 or model == 8:
             iteration = self.inpaint_model.iteration
             inputs = (images * (1 - masks)) + masks
 
@@ -561,6 +635,13 @@ class EdgeConnect():
             inputs = (images_gray * (1 - masks)) + masks
             outputs = self.gradient_model(images_gray, gradient, masks)
             outputs_merged = (outputs * masks) + (gradient * (1 - masks))
+
+        # inpaint with GT gradient
+        elif model == 9:
+            iteration = self.inpaint_model.iteration
+            inputs = (images * (1 - masks)) + masks
+            outputs = self.inpaint_model(images, gradient, masks)
+            outputs_merged = (outputs * masks) + (images * (1 - masks))
 
         # inpaint with edge model / joint model
         else:
@@ -597,7 +678,7 @@ class EdgeConnect():
     def log(self, logs):
         with open(self.log_file, 'a') as f:
             f.write('%s\n' % ' '.join([str(item[1]) for item in logs]))
-
+            
     def cuda(self, *args):
         return (item.to(self.config.DEVICE) for item in args)
 

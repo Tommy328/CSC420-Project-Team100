@@ -85,6 +85,8 @@ class InpaintGenerator(BaseNetwork):
 
         return x
 
+# Modified inpainting generator
+# in_channel set to 5
 class MyInpaintGenerator(BaseNetwork):
     def __init__(self, residual_blocks=8, init_weights=True):
         super(MyInpaintGenerator, self).__init__()
@@ -184,6 +186,7 @@ class EdgeGenerator(BaseNetwork):
         x = torch.sigmoid(x)
         return x
 
+# Gradient generator
 class GradientGenerator(BaseNetwork):
     def __init__(self, residual_blocks=8, use_spectral_norm=True, init_weights=True):
         super(GradientGenerator, self).__init__()

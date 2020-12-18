@@ -90,10 +90,10 @@ class Dataset(torch.utils.data.Dataset):
 
     def load_edge(self, img, index, mask):
         sigma = self.sigma
-
         # in test mode images are masked (with masked regions),
         # using 'mask' parameter prevents canny to detect edges for the masked regions
-        mask = None if self.training else (1 - mask / 255).astype(np.bool)
+        # mask = None if self.training else (1 - mask / 255).astype(np.bool)
+        mask = None
 
         # canny
         if self.edge == 1:
@@ -121,17 +121,18 @@ class Dataset(torch.utils.data.Dataset):
 
     def load_gradient(self, img, index, mask):
         # in test mode images are masked (with masked regions),
-        # using 'mask' parameter prevents canny to detect edges for the masked regions
-        mask = None if self.training else (1 - mask / 255).astype(np.bool)
+        # using 'mask' parameter prevents output to include masked regions
+        # mask = None if self.training else (1 - mask / 255).astype(np.bool)
+        mask = None
 
         filterx = np.array([[0, 0, 0],[-1, 0, 1],[0, 0, 0]])
         # Calculate gradients
         Ix = ndimage.convolve(img, filterx, mode='nearest')
         Iy = ndimage.convolve(img, filterx.T, mode='nearest')
         gradient = np.sqrt(np.square(Ix) + np.square(Iy))
-        # gradient[gradient>np.mean(gradient)] = 1
-        # gradient[gradient!=1] = 0
-        if not self.training:
+
+        # remove masks if testing or sampling
+        if self.training:
             new_mask = np.copy(mask)
             h, w = new_mask.shape[:2]
             for x in range(h):

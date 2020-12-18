@@ -59,7 +59,7 @@ for fn in sorted(files):
         plt.show()
 
     psnr.append(compare_psnr(img_gt, img_pred, data_range=1))
-    ssim.append(compare_ssim(img_gt, img_pred, data_range=1, win_size=51))
+    ssim.append(compare_ssim(img_gt, img_pred, data_range=1, win_size=3))
     mae.append(compare_mae(img_gt, img_pred))
     if np.mod(index, 100) == 0:
         print(
