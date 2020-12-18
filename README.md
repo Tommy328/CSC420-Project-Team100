@@ -1,7 +1,7 @@
-## Edge-Gradient Connect
+## Gradient-Edge Connect - CSC420 Team100 Group Project
 
 ### Introduction:
-We studied on how adding synthesized gradients will provide more structral guidance, making it easier for the inpainting model to recover image content. Our-two staged pipline is adapted from the EdgeConnect architecture. We tend to use both generated edge and generated gradient as inputs to the inpainting model. Detailed description can be found in our report. 
+We studied on how adding synthesized gradients will provide more structral guidance, making it easier for the inpainting model to recover image content. Our two-staged pipline is adapted from the architecture developed by EdgeConnect. We tend to use both generated edge and generated gradient as inputs to the inpainting model. Detailed description can be found in our report. 
 <p align='center'>  
   <img src='https://user-images.githubusercontent.com/29292822/102656400-d2c90080-4141-11eb-83a0-7c1a801f5493.png' width='870'/>
 </p>
@@ -11,7 +11,7 @@ We studied on how adding synthesized gradients will provide more structral guida
 <p align='center'>  
   <img src='https://user-images.githubusercontent.com/29292822/102656539-07d55300-4142-11eb-881a-812824446935.png' width='870'/>
 </p>
-Input images | Input images with missing regions. The missing regions are depicted in white | Generated edge maps; Generated gradient maps | inpainting model output | synthesiszed image
+Input images | Input images with missing regions. The missing regions are depicted in white | Generated edge maps | Generated gradient maps | inpainting model output | synthesiszed image
 
 ## Prerequisites
 - Python 3.6
@@ -22,7 +22,7 @@ Input images | Input images with missing regions. The missing regions are depict
 ### 1) Model 3: EdgeConnect
 We trained our EdgeConnect model with 128x128 inputs for 1e5 iterations.
 
-### 2) Model 8: Edge-gradient Connect
+### 2) Model 8: Gradient-Edge Connect
 Our modified version of EdgeConnect which takes generated edge and gradient along with the masked image as input. 
 <p align='center'>  
   <img src='https://user-images.githubusercontent.com/29292822/102560118-76ada000-409f-11eb-9ac2-177529d7793b.png' width='870'/>
@@ -117,7 +117,7 @@ python ./scripts/fid_score.py --path [path to validation, path to model output] 
 
 ### Model Configuration
 
-The model configuration is stored in a [`config.yaml`](config.yml.example) file under your checkpoints directory. The following tables provide the documentation for all the options available in the configuration file:
+The model configuration is stored in a [`config.yaml`](config.yml.example) file under your checkpoints directory. There are 5 new models in comparsion to the original EdgeConnect configuration. The following tables provide the documentation for all the options available in the configuration file:
 
 #### General Model Configurations
 
