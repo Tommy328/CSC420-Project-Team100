@@ -60,8 +60,8 @@ Our model is trained on the irregular mask dataset from the [QD-IMD](https://git
 Please use [`scripts/flist.py`](scripts/flist.py) to generate train, test and validation set masks file lists as explained above.
 
 ## Getting Started
-Download the pre-trained models using the following links and copy them under `./checkpoints` directory.
-[GradientEdgeConnect](https://drive.google.com/file/d/1TXluV4CrEWCf0nHTxerhWjJ3HwZKkhxh/view?usp=sharing)
+Download the pre-trained models using the following links and copy them under `./checkpoints` directory. These models are trained with input size 128x128 for 1e5 iterations.
+[GradientEdgeConnect](https://drive.google.com/file/d/1TXluV4CrEWCf0nHTxerhWjJ3HwZKkhxh/view?usp=sharing) | [modifiedEdgeConnect](https://drive.google.com/file/d/1tjGkCDAWLURAN9d9dJM8Oh7UVqwsJgMm/view?usp=sharing)
 
 ### 1) Training
 To train the model, create a `config.yaml` file similar to the [example config file](https://github.com/knazeri/edge-connect/blob/master/config.yml.example) and copy it under your checkpoints directory. Read the [configuration](#model-configuration) guide for more information on model configuration.
@@ -94,12 +94,13 @@ python test.py \
 We provide some test examples under `./examples` directory. Please download the [pre-trained models](#getting-started) and run:
 ```bash
 python test.py \
-  --checkpoints ./checkpoints/places2 
-  --input ./examples/places2/images 
-  --mask ./examples/places2/masks
+  --model 8
+  --checkpoints ./checkpoints/gradientEdgeConnect
+  --input ./examples/test1000resized
+  --mask ./examples/mask1000
   --output ./checkpoints/results
 ```
-This script will inpaint all images in `./examples/places2/images` using their corresponding masks in `./examples/places2/mask` directory and saves the results in `./checkpoints/results` directory. By default `test.py` script is run on stage 3 (`--model=3`).
+This script will inpaint all images in `./examples/test1000resized` using their corresponding masks in `./examples/mask1000` directory and saves the results in `./checkpoints/results` directory. By default `test.py` script is run on stage 3 (`--model=3`).
 
 ### 3) Evaluating
 To evaluate the model, you need to first run the model in [test mode](#testing) against your validation set and save the results on disk. We provide a utility [`./scripts/metrics.py`](scripts/metrics.py) to evaluate the model using PSNR, SSIM and Mean Absolute Error:
