@@ -66,7 +66,7 @@ Download the pre-trained models using the following links and copy them under `.
 ### 1) Training
 To train the model, create a `config.yaml` file similar to the [example config file](config.yml.example) and copy it under your checkpoints directory. Read the [configuration](#model-configuration) guide for more information on model configuration.
 
-The original EdgeConnect pipeline has 4 training modes and We have added the training modes 5 to 9: 
+The original EdgeConnect pipeline has 4 training modes and we added the training modes 5 to 9: 
 1) model=1: training the edge generation model
 2) model=2: training the inpainting model using ground truth edges
 3) model=3: training the inpainting model, using edges synthesized by a given edge generation model
