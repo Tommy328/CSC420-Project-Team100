@@ -1,7 +1,7 @@
 ## CSC420 Team100 Group Project - Image Inpainting
 
 ### Introduction:
-We studied on how adding synthesized gradients will provide more structral guidance, making it easier for the inpainting model to recover image content. Our two-staged pipline is adapted from the architecture developed by EdgeConnect. We tend to use both generated edge and generated gradient as inputs to the inpainting model. Detailed description can be found in our report. 
+We studied how adding synthesized gradients will provide more structural guidance, making it easier for the inpainting model to recover image content. Our two-staged pipeline is adapted from the architecture developed by EdgeConnect. We tend to use both the generated edge and generated gradient as inputs to the inpainting model. Detailed descriptions can be found in our report. 
 <p align='center'>  
   <img src='https://user-images.githubusercontent.com/29292822/102656400-d2c90080-4141-11eb-83a0-7c1a801f5493.png' width='870'/>
 </p>
@@ -33,7 +33,7 @@ run demo.bat to start the [demo](https://drive.google.com/file/d/1lPRV5g5hp_o1I2
 
 A window with instructions will pop up and there's a button to upload an image
 
-After loading an image, use mouse to draw
+After loading an image, use the mouse to draw
 
 Press space = change brush size 
 
