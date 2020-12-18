@@ -115,9 +115,6 @@ To measure the Fréchet Inception Distance (FID score) run [`./scripts/fid_score
 python ./scripts/fid_score.py --path [path to validation, path to model output] --gpu [GPU id to use]
 ```
 
-### Alternative Edge Detection
-By default, we use Canny edge detector to extract edge information from the input images. If you want to train the model with an external edge detection ([Holistically-Nested Edge Detection](https://github.com/s9xie/hed) for example), you need to generate edge maps for the entire training/test sets as a pre-processing and their corresponding file lists using [`scripts/flist.py`](scripts/flist.py) as explained above. Please make sure the file names and directory structure match your training/test sets. You can switch to external edge detection by specifying `EDGE=2` in the config file.
-
 ### Model Configuration
 
 The model configuration is stored in a [`config.yaml`](config.yml.example) file under your checkpoints directory. The following tables provide the documentation for all the options available in the configuration file:
