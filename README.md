@@ -1,11 +1,17 @@
 ## Edge-Gradient Connect
 
 ### Introduction:
-We develop a new approach for image inpainting that does a better job of reproducing filled regions exhibiting fine details inspired by our understanding of how artists work: *lines first, color next*. We propose a two-stage adversarial model EdgeConnect that comprises of an edge generator followed by an image completion network. The edge generator hallucinates edges of the missing region (both regular and irregular) of the image, and the image completion network fills in the missing regions using hallucinated edges as a priori. Detailed description of the system can be found in our [paper](https://arxiv.org/abs/1901.00212).
+We studied on how adding synthesized gradients will provide more structral guidance, making it easier for the inpainting model to recover image content. Our-two staged pipline is adapted from the EdgeConnect architecture. We tend to use both generated edge and generated gradient as inputs to the inpainting model. Detailed description can be found in our report. 
 <p align='center'>  
-  <img src='https://user-images.githubusercontent.com/1743048/50673917-aac15080-0faf-11e9-9100-ef10864087c8.png' width='870'/>
+  <img src='https://user-images.githubusercontent.com/29292822/102656400-d2c90080-4141-11eb-83a0-7c1a801f5493.png' width='870'/>
 </p>
-(a) Input images with missing regions. The missing regions are depicted in white. (b) Computed edge masks. Edges drawn in black are computed (for the available regions) using Canny edge detector; whereas edges shown in blue are hallucinated by the edge generator network. (c) Image inpainting results of the proposed approach.
+<p align='center'>  
+  <img src='https://user-images.githubusercontent.com/29292822/102656443-e1171c80-4141-11eb-9ee8-bb2573ab3736.png' width='870'/>
+</p>
+<p align='center'>  
+  <img src='https://user-images.githubusercontent.com/29292822/102656539-07d55300-4142-11eb-881a-812824446935.png' width='870'/>
+</p>
+Input images | Input images with missing regions. The missing regions are depicted in white | Generated edge maps; Generated gradient maps | inpainting model output | synthesiszed image
 
 ## Prerequisites
 - Python 3.6
