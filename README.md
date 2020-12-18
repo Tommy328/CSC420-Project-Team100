@@ -64,16 +64,16 @@ Download the pre-trained models using the following links and copy them under `.
 [GradientEdgeConnect](https://drive.google.com/file/d/1TXluV4CrEWCf0nHTxerhWjJ3HwZKkhxh/view?usp=sharing) | [modifiedEdgeConnect](https://drive.google.com/file/d/1tjGkCDAWLURAN9d9dJM8Oh7UVqwsJgMm/view?usp=sharing)
 
 ### 1) Training
-To train the model, create a `config.yaml` file similar to the [example config file](https://github.com/knazeri/edge-connect/blob/master/config.yml.example) and copy it under your checkpoints directory. Read the [configuration](#model-configuration) guide for more information on model configuration.
+To train the model, create a `config.yaml` file similar to the [example config file](config.yml.example) and copy it under your checkpoints directory. Read the [configuration](#model-configuration) guide for more information on model configuration.
 
 EdgeConnect is trained in three stages: 1) training the edge model, 2) training the inpaint model and 3) training the joint model. To train the model:
 ```bash
 python train.py --model [stage] --checkpoints [path to checkpoints]
 ```
 
-For example to train the edge model on Places2 dataset under `./checkpoints/places2` directory:
+For example to train the gradient edge model under `./checkpoints/gradientEdgeConnect` directory:
 ```bash
-python train.py --model 1 --checkpoints ./checkpoints/places2
+python train.py --model 8 --checkpoints ./checkpoints/gradientEdgeConnect
 ```
 
 Convergence of the model differs from dataset to dataset. For example Places2 dataset converges in one of two epochs, while smaller datasets like CelebA require almost 40 epochs to converge. You can set the number of training iterations by changing `MAX_ITERS` value in the configuration file.
@@ -103,7 +103,7 @@ python test.py \
 This script will inpaint all images in `./examples/test1000resized` using their corresponding masks in `./examples/mask1000` directory and saves the results in `./checkpoints/results` directory. By default `test.py` script is run on stage 3 (`--model=3`).
 
 ### 3) Evaluating
-To evaluate the model, you need to first run the model in [test mode](#testing) against your validation set and save the results on disk. We provide a utility [`./scripts/metrics.py`](scripts/metrics.py) to evaluate the model using PSNR, SSIM and Mean Absolute Error:
+To evaluate the model, you need to first run the model in test mode against your validation set and save the results on disk. We provide a utility [`./scripts/metrics.py`](scripts/metrics.py) to evaluate the model using PSNR, SSIM and Mean Absolute Error:
 
 ```bash
 python ./scripts/metrics.py --data-path [path to validation set] --output-path [path to model output]
@@ -173,14 +173,11 @@ LOG_INTERVAL           | 10    | how many iterations to wait before logging trai
 SAMPLE_INTERVAL        | 1000  | how many iterations to wait before saving sample (0: never)
 SAMPLE_SIZE            | 12    | number of images to sample on each samling interval
 
-## License
-Licensed under a [Creative Commons Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/).
-
-Except where otherwise noted, this content is published under a [CC BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) license, which means that you can copy, remix, transform and build upon the content as long as you do not use the material for commercial purposes and give appropriate credit and provide a link to the license.
-
-
 ## Citation
-If you use this code for your research, please cite our papers <a href="https://arxiv.org/abs/1901.00212">EdgeConnect: Generative Image Inpainting with Adversarial Edge Learning</a> or <a href="http://openaccess.thecvf.com/content_ICCVW_2019/html/AIM/Nazeri_EdgeConnect_Structure_Guided_Image_Inpainting_using_Edge_Prediction_ICCVW_2019_paper.html">EdgeConnect: Structure Guided Image Inpainting using Edge Prediction</a>:
+This project is build based on EdgeConnect. 
+<a href="https://arxiv.org/abs/1901.00212">EdgeConnect: Generative Image Inpainting with Adversarial Edge Learning</a>
+
+<a href="http://openaccess.thecvf.com/content_ICCVW_2019/html/AIM/Nazeri_EdgeConnect_Structure_Guided_Image_Inpainting_using_Edge_Prediction_ICCVW_2019_paper.html">EdgeConnect: Structure Guided Image Inpainting using Edge Prediction</a>:
 
 ```
 @inproceedings{nazeri2019edgeconnect,
