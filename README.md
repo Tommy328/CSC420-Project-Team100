@@ -32,15 +32,10 @@ Our modified version of EdgeConnect which takes generated edge and gradient alon
 run demo.bat to start the demo
 
 A window with instructions will pop up and there's a button to upload an image
-
 After loading an image, use mouse to draw
-
 Press space = change brush size 
-
 Press backspace = reset
-
 Press ESC = exit and save mask
-
 Close the upload window to start inpainting, the inpaint result will be generated in test_output folder.
 
 
