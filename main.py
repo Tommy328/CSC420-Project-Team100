@@ -75,8 +75,9 @@ def load_config(mode=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--path', '--checkpoints', type=str, default='./checkpoints', help='model checkpoints path (default: ./checkpoints)')
-    parser.add_argument('--model', type=int, choices=[1, 2, 3, 4, 5], 
-        help='1: edge model, 2: inpaint model, 3: edge-inpaint model, 4: joint model, 5: edge gradient model')
+    parser.add_argument('--model', type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9], 
+        help='1: edge model, 2: inpaint model with GT edge, 3: edge-inpaint model, 4: joint model, 5: inpaint model with GT edge and GT gradient," + \
+            "6: edge and gradient joint model, 7: gradient model, 8: edge-gradient-inpaint model, 9: gradient-inpaint model')
 
     # test mode
     if mode == 2:
