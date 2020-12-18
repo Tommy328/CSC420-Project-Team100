@@ -29,13 +29,18 @@ Our modified version of EdgeConnect which takes generated edge and gradient alon
 </p>
 
 ## Demo
-run demo.bat to start the demo
+run demo.bat to start the [demo](https://drive.google.com/file/d/1lPRV5g5hp_o1I2Bk8E1caa16rPHk7Buh/view?usp=sharing)
 
 A window with instructions will pop up and there's a button to upload an image
+
 After loading an image, use mouse to draw
+
 Press space = change brush size 
+
 Press backspace = reset
+
 Press ESC = exit and save mask
+
 Close the upload window to start inpainting, the inpaint result will be generated in test_output folder.
 
 
@@ -55,10 +60,8 @@ Our model is trained on the irregular mask dataset from the [QD-IMD](https://git
 Please use [`scripts/flist.py`](scripts/flist.py) to generate train, test and validation set masks file lists as explained above.
 
 ## Getting Started
-Pre-trained models are already included in the git repository under checkpoints folder. 
-
-
-
+Download the pre-trained models using the following links and copy them under `./checkpoints` directory.
+[GradientEdgeConnect](https://drive.google.com/file/d/1TXluV4CrEWCf0nHTxerhWjJ3HwZKkhxh/view?usp=sharing)
 
 ### 1) Training
 To train the model, create a `config.yaml` file similar to the [example config file](https://github.com/knazeri/edge-connect/blob/master/config.yml.example) and copy it under your checkpoints directory. Read the [configuration](#model-configuration) guide for more information on model configuration.
@@ -123,7 +126,7 @@ The model configuration is stored in a [`config.yaml`](config.yml.example) file 
 Option          | Description
 ----------------| -----------
 MODE            | 1: train, 2: test, 3: eval
-MODEL           | 1: edge model, 2: inpaint model, 3: edge-inpaint model, 4: joint model, 5: inpaint model with GT edge and GT gradient, 6: edge and gradient joint model, 7: gradient model, 8: edge-gradient-inpaint model
+MODEL           | 1: edge model, 2: inpaint model, 3: edge-inpaint model, 4: joint model, 5: inpaint model with GT edge and GT gradient, 6: edge and gradient joint model, 7: gradient model, 8: edge-gradient-inpaint model, 9: gradient-inpaint model
 MASK            | 1: random block, 2: half, 3: external, 4: external + random block, 5: external + random block + half
 EDGE            | 1: canny, 2: external
 NMS             | 0: no non-max-suppression, 1: non-max-suppression on the external edges
