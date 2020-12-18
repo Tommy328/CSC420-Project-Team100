@@ -1,5 +1,5 @@
-## EdgeConnect: Generative Image Inpainting with Adversarial Edge Learning
-[ArXiv](https://arxiv.org/abs/1901.00212) | [BibTex](#citation)
+## Edge-Gradient Connect
+
 ### Introduction:
 We develop a new approach for image inpainting that does a better job of reproducing filled regions exhibiting fine details inspired by our understanding of how artists work: *lines first, color next*. We propose a two-stage adversarial model EdgeConnect that comprises of an edge generator followed by an image completion network. The edge generator hallucinates edges of the missing region (both regular and irregular) of the image, and the image completion network fills in the missing regions using hallucinated edges as a priori. Detailed description of the system can be found in our [paper](https://arxiv.org/abs/1901.00212).
 <p align='center'>  
@@ -8,25 +8,34 @@ We develop a new approach for image inpainting that does a better job of reprodu
 (a) Input images with missing regions. The missing regions are depicted in white. (b) Computed edge masks. Edges drawn in black are computed (for the available regions) using Canny edge detector; whereas edges shown in blue are hallucinated by the edge generator network. (c) Image inpainting results of the proposed approach.
 
 ## Prerequisites
-- Python 3
+- Python 3.6
 - PyTorch 1.0
 - NVIDIA GPU + CUDA cuDNN
 
-## Installation
-- Clone this repo:
-```bash
-git clone https://github.com/knazeri/edge-connect.git
-cd edge-connect
-```
-- Install PyTorch and dependencies from http://pytorch.org
-- Install python requirements:
-```bash
-pip install -r requirements.txt
-```
+## Models
+### 1) Model 3: EdgeConnect
+We trained our EdgeConnect model with 128x128 inputs for 1e5 iterations.
+
+### 2) Model 8: Edge-gradient Connect
+Our modified version of EdgeConnect which takes generated edge and gradient along with the masked image as input. 
+<p align='center'>  
+  <img src='https://user-images.githubusercontent.com/29292822/102560118-76ada000-409f-11eb-9ac2-177529d7793b.png' width='870'/>
+</p>
+
+## Demo
+run demo.bat to start the demo
+
+A window with instructions will pop up and there's a button to upload an image
+After loading an image, use mouse to draw
+Press space = change brush size 
+Press backspace = reset
+Press ESC = exit and save mask
+Close the upload window to start inpainting, the inpaint result will be generated in test_output folder.
+
 
 ## Datasets
 ### 1) Images
-We use [Places2](http://places2.csail.mit.edu), [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and [Paris Street-View](https://github.com/pathak22/context-encoder) datasets. To train a model on the full dataset, download datasets from official websites. 
+We use [Places2](http://places2.csail.mit.edu) Standard small images dataset, which consists of 1.8 million images of various scene categories. 
 
 After downloading, run [`scripts/flist.py`](scripts/flist.py) to generate train, test and validation set file lists. For example, to generate the training set file list on Places2 dataset run:
 ```bash
@@ -35,21 +44,15 @@ python ./scripts/flist.py --path path_to_places2_train_set --output ./datasets/p
 ```
 
 ### 2) Irregular Masks
-Our model is trained on the irregular mask dataset provided by [Liu et al.](https://arxiv.org/abs/1804.07723). You can download publically available Irregular Mask Dataset from [their website](http://masc.cs.gmu.edu/wiki/partialconv).
-
-Alternatively, you can download [Quick Draw Irregular Mask Dataset](https://github.com/karfly/qd-imd) by Karim Iskakov which is combination of 50 million strokes drawn by human hand.
+Our model is trained on the irregular mask dataset from the [QD-IMD](https://github.com/karfly/qd-imd) dataset. Input size is reduced to 128 pixels for faster training (default for EdgeConnect is 256 pixels).
 
 Please use [`scripts/flist.py`](scripts/flist.py) to generate train, test and validation set masks file lists as explained above.
 
 ## Getting Started
-Download the pre-trained models using the following links and copy them under `./checkpoints` directory.
+Pre-trained models are already included in the git repository under checkpoints folder. 
 
-[Places2](https://drive.google.com/drive/folders/1KyXz4W4SAvfsGh3NJ7XgdOv5t46o-8aa) | [CelebA](https://drive.google.com/drive/folders/1nkLOhzWL-w2euo0U6amhz7HVzqNC5rqb) | [Paris-StreetView](https://drive.google.com/drive/folders/1cGwDaZqDcqYU7kDuEbMXa9TP3uDJRBR1)
 
-Alternatively, you can run the following script to automatically download the pre-trained models:
-```bash
-bash ./scripts/download_model.sh
-```
+
 
 ### 1) Training
 To train the model, create a `config.yaml` file similar to the [example config file](https://github.com/knazeri/edge-connect/blob/master/config.yml.example) and copy it under your checkpoints directory. Read the [configuration](#model-configuration) guide for more information on model configuration.
@@ -114,7 +117,7 @@ The model configuration is stored in a [`config.yaml`](config.yml.example) file 
 Option          | Description
 ----------------| -----------
 MODE            | 1: train, 2: test, 3: eval
-MODEL           | 1: edge model, 2: inpaint model, 3: edge-inpaint model, 4: joint model
+MODEL           | 1: edge model, 2: inpaint model, 3: edge-inpaint model, 4: joint model, 5: inpaint model with GT edge and GT gradient, 6: edge and gradient joint model, 7: gradient model, 8: edge-gradient-inpaint model
 MASK            | 1: random block, 2: half, 3: external, 4: external + random block, 5: external + random block + half
 EDGE            | 1: canny, 2: external
 NMS             | 0: no non-max-suppression, 1: non-max-suppression on the external edges
