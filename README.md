@@ -73,11 +73,11 @@ The original EdgeConnect pipeline has 3 training modes:
 4) model=4: training the edge generation and inpainting models at the same time
 
 We have added the following training modes:
-5)Model=5: training the inpainting model with ground truth edges and ground truth gradients
-6)Model=6: training the inpainting model, edge generation model and gradient generation model all at the same time
-7)Model=7: training the gradient generation model
-8)Model=8: training the inpainting model, using edges synthesized by edge generation model and gradients synthesized by gradient generation model
-9)Model=9: training the inpainting model using ground truth gradients
+5) Model=5: training the inpainting model with ground truth edges and ground truth gradients
+6) Model=6: training the inpainting model, edge generation model and gradient generation model all at the same time
+7) Model=7: training the gradient generation model
+8) Model=8: training the inpainting model, using edges synthesized by edge generation model and gradients synthesized by gradient generation model
+9) Model=9: training the inpainting model using ground truth gradients
 
 To train the model, call:
 ```bash
