@@ -48,14 +48,14 @@ Close the upload window to start inpainting, the inpaint result will be generate
 ### 1) Images
 We use [Places2](http://places2.csail.mit.edu) Standard small images dataset, which consists of 1.8 million images of various scene categories. 
 
-After downloading, run [`scripts/flist.py`](scripts/flist.py) to generate train, test and validation set file lists. For example, to generate the training set file list on Places2 dataset run:
+After downloading, run [`scripts/flist.py`](scripts/flist.py) to generate train, test and validation set file lists. For example, to generate the training set file list on the Places2 dataset run:
 ```bash
 mkdir datasets
 python ./scripts/flist.py --path path_to_places2_train_set --output ./datasets/places_train.flist
 ```
 
 ### 2) Irregular Masks
-Our model is trained on the irregular mask dataset from the [QD-IMD](https://github.com/karfly/qd-imd) dataset. Input size is reduced to 128 pixels for faster training (default for EdgeConnect is 256 pixels).
+Our model is trained on the irregular mask dataset from the [QD-IMD](https://github.com/karfly/qd-imd) dataset. The input size is reduced to 128 pixels for faster training (the default for EdgeConnect is 256 pixels).
 
 Please use [`scripts/flist.py`](scripts/flist.py) to generate train, test and validation set masks file lists as explained above.
 
@@ -71,12 +71,12 @@ EdgeConnect is trained in three stages: 1) training the edge model, 2) training 
 python train.py --model [stage] --checkpoints [path to checkpoints]
 ```
 
-For example to train the gradient edge model under `./checkpoints/gradientEdgeConnect` directory:
+For example, to train the gradient edge model under `./checkpoints/gradientEdgeConnect` directory:
 ```bash
 python train.py --model 8 --checkpoints ./checkpoints/gradientEdgeConnect
 ```
 
-Convergence of the model differs from dataset to dataset. For example Places2 dataset converges in one of two epochs, while smaller datasets like CelebA require almost 40 epochs to converge. You can set the number of training iterations by changing `MAX_ITERS` value in the configuration file.
+The convergence of the model differs from dataset to dataset. For example, the Places2 dataset converges in one of two epochs, while smaller datasets like CelebA require almost 40 epochs to converge. You can set the number of training iterations by changing `MAX_ITERS` value in the configuration file.
 
 ### 2) Testing
 To test the model, create a `config.yaml` file similar to the [example config file](config.yml.example) and copy it under your checkpoints directory. Read the [configuration](#model-configuration) guide for more information on model configuration.
@@ -109,7 +109,7 @@ To evaluate the model, you need to first run the model in test mode against your
 python ./scripts/metrics.py --data-path [path to validation set] --output-path [path to model output]
 ```
 
-To measure the Fréchet Inception Distance (FID score) run [`./scripts/fid_score.py`](scripts/fid_score.py). We utilize the PyTorch implementation of FID [from here](https://github.com/mseitzer/pytorch-fid) which uses the pretrained weights from PyTorch's Inception model.
+To measure the Fréchet Inception Distance (FID score) run [`./scripts/fid_score.py`](scripts/fid_score.py). We utilize the PyTorch implementation of FID [from here](https://github.com/mseitzer/pytorch-fid) which uses the pre-trained weights from PyTorch's Inception model.
 
 ```bash
 python ./scripts/fid_score.py --path [path to validation, path to model output] --gpu [GPU id to use]
@@ -117,7 +117,7 @@ python ./scripts/fid_score.py --path [path to validation, path to model output] 
 
 ### Model Configuration
 
-The model configuration is stored in a [`config.yaml`](config.yml.example) file under your checkpoints directory. There are 5 new models in comparsion to the original EdgeConnect configuration. The following tables provide the documentation for all the options available in the configuration file:
+The model configuration is stored in a [`config.yaml`](config.yml.example) file under your checkpoints directory. There are 5 new models in comparision to the original EdgeConnect configuration. The following tables provide the documentation for all the options available in the configuration file:
 
 #### General Model Configurations
 
