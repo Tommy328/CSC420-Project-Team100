@@ -1,4 +1,4 @@
-## Gradient-Edge Connect - CSC420 Team100 Group Project
+## CSC420 Team100 Group Project - Image Inpainting
 
 ### Introduction:
 We studied on how adding synthesized gradients will provide more structral guidance, making it easier for the inpainting model to recover image content. Our two-staged pipline is adapted from the architecture developed by EdgeConnect. We tend to use both generated edge and generated gradient as inputs to the inpainting model. Detailed description can be found in our report. 
